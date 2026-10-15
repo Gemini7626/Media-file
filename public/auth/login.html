@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng nhập | Media Studio AI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #0b1020;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .card {
+      width: 100%;
+      max-width: 390px;
+      padding: 28px;
+      background: #171e32;
+      border: 1px solid #303b55;
+      border-radius: 18px;
+    }
+    h2 { text-align: center; }
+    input, button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border-radius: 9px;
+      font-size: 15px;
+    }
+    input {
+      background: #0b1020;
+      border: 1px solid #48536b;
+      color: white;
+    }
+    button {
+      background: #6366f1;
+      color: white;
+      border: none;
+      font-weight: bold;
+    }
+    #message {
+      min-height: 24px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h2>Media Studio AI v7</h2>
+    <p>Đăng nhập để truy cập tài khoản.</p>
+    <form id="loginForm">
+      <input id="email" type="email"
+        placeholder="Email" required>
+      <input id="password" type="password"
+        placeholder="Mật khẩu" required>
+      <button type="submit" id="loginBtn">
+        Đăng nhập
+      </button>
+    </form>
+    <p id="message" role="status"></p>
+    <a href="/" style="color:#a5b4fc">
+      Quay về trang chủ
+    </a>
+  </main>
+
+  <script src="/auth/config.js"></script>
+  <script type="module">
+    import { createClient } from
+      "https://esm.sh/@supabase/supabase-js@2";
+
+    const { supabaseUrl, supabaseKey } =
+      window.STUDIO_CONFIG;
+
+    const supabase =
+      createClient(supabaseUrl, supabaseKey);
+
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+    const button = document.getElementById("loginBtn");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      message.textContent = "Đang đăng nhập...";
+
+      const { error } =
+        await supabase.auth.signInWithPassword({
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value
+        });
+
+      if (error) {
+        message.textContent = "Đăng nhập thất bại: " +
+          error.message;
+      } else {
+        message.textContent = "Đăng nhập thành công!";
+        window.location.href = "/";
+      }
+
+      button.disabled = false;
+    });
+  </script>
+</body>
+</html>
+
