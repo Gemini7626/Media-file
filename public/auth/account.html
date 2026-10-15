@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tài khoản - Media Studio AI v7</title>
+<style>
+body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh}
+main{background:#1c2035;padding:28px;border:1px solid #444765;border-radius:20px;width:min(85%,420px)}
+h1{font-size:26px}
+button,a{display:block;margin-top:20px;padding:14px;border-radius:10px;text-align:center}
+button{background:#6366f1;color:white;border:0;width:100%;font-size:17px}
+a{color:#c4b5fd}
+#email{overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+<h1>Thông tin tài khoản</h1>
+<p id="status">Đang kiểm tra đăng nhập...</p>
+<p id="email"></p>
+<button id="logout" hidden>Đăng xuất</button>
+<a href="/">Quay về trang chủ</a>
+</main>
+
+<script src="/auth/config.js"></script>
+<script type="module">
+import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
+
+const {supabaseUrl,supabaseKey}=window.STUDIO_CONFIG;
+const supabase=createClient(supabaseUrl,supabaseKey);
+
+const status=document.getElementById("status");
+const email=document.getElementById("email");
+const logout=document.getElementById("logout");
+
+try {
+  const {data,error}=await supabase.auth.getUser();
+  if(error || !data.user){
+    window.location.replace("/auth/login.html");
+  }else{
+    status.textContent="Đã đăng nhập";
+    email.textContent="Email: "+(data.user.email || "");
+    logout.hidden=false;
+  }
+}catch(e){
+  status.textContent="Không thể kiểm tra phiên đăng nhập: "+e.message;
+}
+
+logout.onclick=async()=>{
+  const {error}=await supabase.auth.signOut();
+  if(error){
+    status.textContent="Đăng xuất thất bại: "+error.message;
+    return;
+  }
+  window.location.replace("/auth/login.html");
+};
+</script>
+</body>
+</html>
