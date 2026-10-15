@@ -1,0 +1,6 @@
+# Copy this file to .dev.vars (never commit it)
+# Optional, for higher Civitai API allowance:
+CIVITAI_API_TOKEN=
+# GPU API service MUST implement the contract in docs/GPU-CONTRACT.md
+GPU_API_URL=https://your-gpu-api.example
+GPU_API_TOKEN=replace-with-secret

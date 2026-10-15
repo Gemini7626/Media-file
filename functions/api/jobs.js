@@ -1,0 +1,2 @@
+import {gpu} from './_gpu.js';
+export async function onRequestGet({request,env}){const id=new URL(request.url).searchParams.get('id')||'';if(!/^[a-zA-Z0-9_-]{1,120}$/.test(id))return Response.json({error:'ID không hợp lệ'},{status:400});try{const d=await gpu(env,'/v1/jobs/'+encodeURIComponent(id));return Response.json({id,status:d.status||'unknown',output:d.output||null,error:d.error||null})}catch(e){return Response.json({error:e.message},{status:502})}}
