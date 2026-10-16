@@ -1,3 +1,4 @@
+import { requireAdmin } from "../_auth.js";
 export async function onRequestGet({ request, env }) {
   const json = (data, status = 200) =>
     Response.json(data, {
@@ -5,12 +6,10 @@ export async function onRequestGet({ request, env }) {
       headers: { "Cache-Control": "no-store" }
     });
 
-  const token = request.headers.get("X-Studio-Token");
+  const auth = await requireAdmin(request, env);
 
-  if (!env.STUDIO_ACCESS_TOKEN ||
-      !token ||
-      token !== env.STUDIO_ACCESS_TOKEN) {
-    return json({ error: "Không có quyền truy cập" }, 401);
+  if (auth.error) {
+    return json({ error: auth.error }, auth.status);
   }
 
   if (!env.REPLICATE_API_TOKEN) {

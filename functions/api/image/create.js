@@ -1,3 +1,4 @@
+import { requireAdmin } from "../_auth.js";
 const MODELS = {
   "flux-schnell": "black-forest-labs/flux-schnell",
   "flux-dev": "black-forest-labs/flux-dev"
@@ -11,11 +12,10 @@ export async function onRequestPost({ request, env }) {
     });
 
   // Chưa mở API trả phí khi chưa có xác thực phía máy chủ.
-  const expected = env.STUDIO_ACCESS_TOKEN;
-  const supplied = request.headers.get("X-Studio-Token");
+  const auth = await requireAdmin(request, env);
 
-  if (!expected || !supplied || supplied !== expected) {
-    return json({ error: "Chưa được cấp quyền tạo ảnh" }, 401);
+  if (auth.error) {
+    return json({ error: auth.error }, auth.status);
   }
 
   if (!env.REPLICATE_API_TOKEN) {
