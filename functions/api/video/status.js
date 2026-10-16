@@ -1,6 +1,10 @@
+import { requireAdmin } from "../_auth.js";
 const reply=(data,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
 export async function onRequestGet({request,env}){
- if(!env.STUDIO_ACCESS_TOKEN||request.headers.get('Authorization')!==`Bearer ${env.STUDIO_ACCESS_TOKEN}`)return reply({error:'Unauthorized'},401);
+ const auth = await requireAdmin(request, env);
+if (auth.error) {
+  return reply({ error: auth.error }, auth.status);
+}
  const u=new URL(request.url),provider=u.searchParams.get('provider'),id=u.searchParams.get('id');
  if(!id||!/^[\w-]{1,128}$/.test(id))return reply({error:'Invalid job id'},400);
  let endpoint,token;

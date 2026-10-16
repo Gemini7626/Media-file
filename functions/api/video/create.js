@@ -1,7 +1,10 @@
+import { requireAdmin } from "../_auth.js";
 const reply=(data,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
 export async function onRequestPost({request,env}) {
-  if(!env.STUDIO_ACCESS_TOKEN) return reply({error:'Configure STUDIO_ACCESS_TOKEN secret before enabling paid generation'},503);
-  if(request.headers.get('Authorization')!==`Bearer ${env.STUDIO_ACCESS_TOKEN}`) return reply({error:'Unauthorized'},401);
+  const auth = await requireAdmin(request, env);
+  if (auth.error) {
+    return reply({ error: auth.error }, auth.status);
+  }
   let body;try{body=await request.json()}catch{return reply({error:'Invalid JSON'},400)}
   const {provider,model,input}=body;
   if(!['replicate','gpu'].includes(provider)||!input||typeof input.prompt!=='string'||!input.prompt.trim())return reply({error:'Missing provider or prompt'},400);
